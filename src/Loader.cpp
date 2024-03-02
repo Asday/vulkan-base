@@ -8,9 +8,8 @@
 
 Loader::Loader(const DLL& dll) {
 	const auto r{dll.getHandle("vkGetInstanceProcAddr")};
-	if (!r.first) {
-		throw std::runtime_error(r.second.value());
-	}
+	if (!r.first) throw std::runtime_error(r.second.value());
+
 	vkGetInstanceProcAddr =
 		reinterpret_cast<PFN_vkGetInstanceProcAddr>(r.first.value());
 
