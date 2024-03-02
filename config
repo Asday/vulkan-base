@@ -1,0 +1,20 @@
+BASE_CPPFLAGS = \
+	-std=c++23 \
+	-lvulkan -ldl -lxcb \
+	-DVK_USE_PLATFORM_XCB_KHR \
+	-O3
+
+# One config per required build configuration.  The first config listed
+# is used as the default for `make {cmd}`.
+#
+# Each config is controlled by `{config}-CPPFLAGS` which is added to
+# `BASE_CPPFLAGS`.
+configs = debug release
+release-CPPFLAGS = -DNDEBUG
+debug-CPPFLAGS = \
+	-Wall \
+	-Werror \
+	-Wextra \
+	-Wsign-conversion \
+	-pedantic-errors \
+	-g
