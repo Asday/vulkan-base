@@ -10,10 +10,7 @@
 
 using namespace std::literals::string_literals;
 
-Instance::Instance(
-	PFN_vkCreateInstance vkCreateInstance,
-	PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr
-) {
+Instance::Instance(const Loader& loader) {
 		VkApplicationInfo applicationInfo{
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
 		.pNext = nullptr,
@@ -36,7 +33,7 @@ Instance::Instance(
 	};
 
 	{
-		const VkResult r = vkCreateInstance(
+		const VkResult r = loader.vkCreateInstance(
 			&instanceCreateInfo,
 			nullptr,
 			&instance
@@ -49,7 +46,9 @@ Instance::Instance(
 	}
 
 	#define o(name) \
-		name = reinterpret_cast<PFN_##name>(vkGetInstanceProcAddr(instance, #name));
+		name = reinterpret_cast<PFN_##name>( \
+			loader.vkGetInstanceProcAddr(instance, #name) \
+		);
 	INSTANCE_FUNCTIONS(o)
 	#undef o
 	#undef INSTANCE_FUNCTIONS

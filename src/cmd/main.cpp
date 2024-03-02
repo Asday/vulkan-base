@@ -1,4 +1,5 @@
 #include "../DLL.h"
+#include "../Loader.h"
 #include "../Instance.h"
 #include "../narrow_cast.h"
 #include "../return_codes.h"
@@ -13,32 +14,9 @@ using namespace std::literals::string_literals;
 
 
 int main() {
-	const DLL vulkan{"libvulkan.so"s};
-
-	PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr;
-	{
-		const auto r{vulkan.getHandle("vkGetInstanceProcAddr")};
-		if (!r.first) {
-			std::cout << r.second.value() << std::endl;
-			return 1;
-		} else {
-			vkGetInstanceProcAddr =
-				reinterpret_cast<PFN_vkGetInstanceProcAddr>(r.first.value());
-		}
-	}
-
-	#define GLOBAL_FUNCTIONS(o) \
-		o(vkCreateInstance)
-
-	#define o(name) \
-		auto name{ \
-			reinterpret_cast<PFN_##name>(vkGetInstanceProcAddr(nullptr, #name)) \
-		};
-	GLOBAL_FUNCTIONS(o)
-	#undef o
-	#undef GLOBAL_FUNCTIONS
-
-	Instance instance{vkCreateInstance, vkGetInstanceProcAddr};
+	const DLL dll{"libvulkan.so"s};
+	const Loader loader{dll};
+	const Instance instance{loader};
 
 	VkDevice device{};
 	{
