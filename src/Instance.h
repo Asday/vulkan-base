@@ -1,6 +1,7 @@
 #ifndef _e04e5c2e8e1549469cdb304bcc6d8b2a
 #define _e04e5c2e8e1549469cdb304bcc6d8b2a
 
+#include "Device.h"
 #include "Loader.h"
 
 #include <vulkan/vulkan.h>
@@ -13,10 +14,11 @@
 	o(vkCreateDevice)
 
 class Instance {
+	const Loader loader;
 	public:
 	VkInstance instance;
 
-	Instance(const Loader& loader);  // Throws `std::runtime_error()`.
+	Instance();  // Throws `std::runtime_error()`.
 	Instance(const Instance&) = delete;
 	Instance(Instance&&) = delete;
 	Instance& operator=(const Instance&) = delete;
@@ -26,6 +28,8 @@ class Instance {
 	#define o(name) PFN_##name name;
 	INSTANCE_FUNCTIONS(o)
 	#undef o
+
+	Result<Device> createDevice() const noexcept;
 };
 
 #ifndef INSTANCE_IMPL

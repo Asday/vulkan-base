@@ -1,17 +1,20 @@
-#define VULKAN_IMPL
+#define LOADER_IMPL
 #include "Loader.h"
-#undef VULKAN_IMPL
+#undef LOADER_IMPL
 
 #include "DLL.h"
 
 #include <stdexcept>
+#include <string>
 
-Loader::Loader(const DLL& dll) {
+using namespace std::literals::string_literals;
+
+Loader::Loader() : dll(DLL("libvulkan.so"s)) {
 	const auto r{dll.getHandle("vkGetInstanceProcAddr")};
-	if (!r.first) throw std::runtime_error(r.second.value());
+	if (!r.success) throw std::runtime_error(r.error);
 
 	vkGetInstanceProcAddr =
-		reinterpret_cast<PFN_vkGetInstanceProcAddr>(r.first.value());
+		reinterpret_cast<PFN_vkGetInstanceProcAddr>(r.value);
 
 	#define o(name) \
 		name = reinterpret_cast<PFN_##name>(vkGetInstanceProcAddr(nullptr, #name));

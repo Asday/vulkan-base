@@ -1,11 +1,9 @@
 #include "DLL.h"
 
 #include <dlfcn.h>
-#include <optional>
 #include <stdexcept>
 #include <sstream>
 #include <string>
-#include <utility>
 
 using namespace std::literals::string_literals;
 
@@ -37,15 +35,15 @@ std::ostream& operator<<(std::ostream& os, const DLL& dll) {
 	return os;
 }
 
-std::pair<std::optional<void*>, std::optional<std::string>>
+Result<void*>
 DLL::getHandle(const std::string& name) const noexcept {
 	dlerror();  // Clear any existing errors.
 	void* ret{dlsym(dll, name.c_str())};
 
 	char* error{dlerror()};
-	if (error != NULL) return std::make_pair(std::nullopt, std::string{error});
+	if (error != NULL) return {.success{false}, .error{std::string{error}}};
 
-	return std::make_pair(ret, std::nullopt);
+	return {.success{true}, .value{ret}};
 }
 
 DLL::~DLL() {

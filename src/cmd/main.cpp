@@ -1,18 +1,19 @@
-#include "../DLL.h"
 #include "../Device.h"
-#include "../Loader.h"
 #include "../Instance.h"
 
 #include <vulkan/vulkan.h>
 
+#include <iostream>
 #include <string>
 
 using namespace std::literals::string_literals;
 
 
 int main() {
-	const DLL dll{"libvulkan.so"s};
-	const Loader loader{dll};
-	const Instance instance{loader};
-	const Device device{instance};
+	const Instance instance{};
+	const auto r{instance.createDevice()};
+	if (!r.success) {
+		std::cout << "failed to create a device: "s << r.error << std::endl;
+		return -1;
+	}
 }

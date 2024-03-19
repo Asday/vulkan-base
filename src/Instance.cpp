@@ -2,6 +2,7 @@
 #include "Instance.h"
 #undef INSTANCE_IMPL
 
+#include "Loader.h"
 #include "return_codes.h"
 
 #include <stdexcept>
@@ -10,8 +11,8 @@
 
 using namespace std::literals::string_literals;
 
-Instance::Instance(const Loader& loader) {
-		VkApplicationInfo applicationInfo{
+Instance::Instance() : loader(Loader()) {
+	VkApplicationInfo applicationInfo{
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
 		.pNext = nullptr,
 		.pApplicationName = "API without Secrets: Introduction to Vulkan",
@@ -55,3 +56,11 @@ Instance::Instance(const Loader& loader) {
 }
 
 Instance::~Instance() { vkDestroyInstance(instance, nullptr); }
+
+Result<Device> Instance::createDevice() const noexcept {
+	try {
+		return {.success{true}, .value{*this}};
+	} catch (const std::runtime_error& e) {
+		return {.success{false}, .error{e.what()}};
+	}
+}

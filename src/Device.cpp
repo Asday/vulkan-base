@@ -1,5 +1,7 @@
 #include "Device.h"
 
+#include "Instance.h"
+
 #include "return_codes.h"
 #include "narrow_cast.h"
 

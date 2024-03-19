@@ -3,17 +3,17 @@
 
 #include <vulkan/vulkan.h>
 
-#include "Instance.h"
+class Instance;
 
 class Device {
 	VkDevice device;
 
 	public:
 	Device(const Instance& instance);  // Throws `std::runtime_error()`.
-	Device(const Device&);
-	Device(Device&&);
-	Device& operator=(const Device&);
-	Device& operator=(Device&&);
+	Device(const Device&) = delete;
+	Device(Device&&) = delete;
+	Device& operator=(const Device&) = delete;
+	Device& operator=(Device&&) = delete;
 	~Device();
 };
 

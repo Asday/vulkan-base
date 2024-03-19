@@ -9,8 +9,9 @@
 #define GLOBAL_FUNCTIONS(o) o(vkCreateInstance)
 
 class Loader {
+	const DLL dll;
 	public:
-	Loader(const DLL& dll);  // Throws `std::runtime_error()`.
+	Loader();  // Throws `std::runtime_error()`.
 
 	#define o(name) PFN_##name name;
 	EXPORTED_FUNCTIONS(o)
@@ -19,7 +20,7 @@ class Loader {
 	#undef EXPORTED_FUNCTIONS
 };
 
-#ifndef VULKAN_IMPL
+#ifndef LOADER_IMPL
 #undef GLOBAL_FUNCTIONS
 #endif
 

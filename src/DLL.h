@@ -1,6 +1,8 @@
 #ifndef _9ece23355a64419fbf3b0a8739c16dae
 #define _9ece23355a64419fbf3b0a8739c16dae
 
+#include "Result.h"
+
 #include <optional>
 #include <stdexcept>
 #include <string>
@@ -25,8 +27,7 @@ class DLL {
 
 	friend std::ostream& operator<<(std::ostream& os, const DLL& dll);
 
-	std::pair<std::optional<void*>, std::optional<std::string>>
-	getHandle(const std::string& name) const noexcept;
+	Result<void*> getHandle(const std::string& name) const noexcept;
 };
 
 #endif
