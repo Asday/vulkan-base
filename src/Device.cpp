@@ -134,20 +134,23 @@ namespace {
 
 		return device;
 	}
-}
 
-Device::Device(const Instance& instance) {
-	for (const auto& d : enumerateDevices(instance)) {
-		if (isSuitable(instance, d)) {
-			auto sqfi{findSuitableQueueFamilyIndex(instance, d)};
-			if (sqfi) {
-				device = createDevice(instance, d, sqfi.value());
-				return;
+	VkDevice findAndCreateDevice(const Instance& instance) {
+		for (const auto& d : enumerateDevices(instance)) {
+			if (isSuitable(instance, d)) {
+				auto sqfi{findSuitableQueueFamilyIndex(instance, d)};
+				if (sqfi) {
+					return createDevice(instance, d, sqfi.value());
+				}
 			}
 		}
-	}
 
-	throw std::runtime_error("unable to find a suitable device"s);
+		throw std::runtime_error("unable to find a suitable device"s);
+	}
+}
+
+Device::Device(const Instance& instance) :
+	device(findAndCreateDevice(instance)) {}
 }
 
 Device::~Device() {}
