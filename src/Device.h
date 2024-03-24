@@ -5,6 +5,8 @@
 
 class Instance;
 
+#define DEVICE_FUNCTIONS(o) o(vkDestroyDevice)
+
 class Device {
 	VkDevice device;
 
@@ -15,6 +17,14 @@ class Device {
 	Device& operator=(const Device&) = delete;
 	Device& operator=(Device&&) = delete;
 	~Device();
+
+	#define o(name) PFN_##name name;
+	DEVICE_FUNCTIONS(o)
+	#undef o
 };
+
+#ifndef DEVICE_IMPL
+#undef DEVICE_FUNCTIONS
+#endif
 
 #endif

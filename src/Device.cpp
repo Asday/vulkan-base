@@ -1,4 +1,6 @@
+#define DEVICE_IMPL
 #include "Device.h"
+#undef DEVICE_IMPL
 
 #include "Instance.h"
 
@@ -150,7 +152,14 @@ namespace {
 }
 
 Device::Device(const Instance& instance) :
-	device(findAndCreateDevice(instance)) {}
+	device(findAndCreateDevice(instance)) {
+	#define o(name) \
+		name = reinterpret_cast<PFN_##name>( \
+			instance.vkGetDeviceProcAddr(device, #name) \
+		);
+	DEVICE_FUNCTIONS(o)
+	#undef o
+	#undef DEVICE_FUNCTIONS
 }
 
-Device::~Device() {}
+Device::~Device() { vkDestroyDevice(device, nullptr); }

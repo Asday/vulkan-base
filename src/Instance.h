@@ -11,7 +11,8 @@
 	o(vkEnumeratePhysicalDevices) \
 	o(vkGetPhysicalDeviceProperties) \
 	o(vkGetPhysicalDeviceQueueFamilyProperties) \
-	o(vkCreateDevice)
+	o(vkCreateDevice) \
+	o(vkGetDeviceProcAddr)
 
 class Instance {
 	const Loader loader;
