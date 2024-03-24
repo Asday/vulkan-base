@@ -88,7 +88,7 @@ namespace {
 		auto queueFamilies{enumerateQueueFamilies(instance, d)};
 		for (uint32_t i = 0; i < queueFamilies.size(); i++) {
 			const auto& qf{queueFamilies[i]};
-			if (isSuitable(qf)) return std::optional<uint32_t>(i);
+			if (isSuitable(qf)) return {i};
 		}
 
 		return std::nullopt;
