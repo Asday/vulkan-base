@@ -136,23 +136,22 @@ namespace {
 
 		return device;
 	}
-
-	VkDevice findAndCreateDevice(const Instance& instance) {
-		for (const auto& d : enumerateDevices(instance)) {
-			if (isSuitable(instance, d)) {
-				auto sqfi{findSuitableQueueFamilyIndex(instance, d)};
-				if (sqfi) {
-					return createDevice(instance, d, sqfi.value());
-				}
-			}
-		}
-
-		throw std::runtime_error("unable to find a suitable device"s);
-	}
 }
 
-Device::Device(const Instance& instance) :
-	device(findAndCreateDevice(instance)) {
+Device::Device(const Instance& instance) {
+	std::optional<uint32_t> sqfi;
+	for (const auto& physicalDevice : enumerateDevices(instance)) {
+		if (isSuitable(instance, physicalDevice)) {
+			sqfi = findSuitableQueueFamilyIndex(instance, physicalDevice);
+			if (sqfi) {
+				device = createDevice(instance, physicalDevice, sqfi.value());
+				goto success;
+			}
+		}
+	}
+	throw std::runtime_error("unable to find a suitable device"s);
+	success:
+
 	#define o(name) \
 		name = reinterpret_cast<PFN_##name>( \
 			instance.vkGetDeviceProcAddr(device, #name) \
@@ -160,6 +159,8 @@ Device::Device(const Instance& instance) :
 	DEVICE_FUNCTIONS(o)
 	#undef o
 	#undef DEVICE_FUNCTIONS
+
+	vkGetDeviceQueue(device, sqfi.value(), 0, &queue);
 }
 
 Device::~Device() { vkDestroyDevice(device, nullptr); }

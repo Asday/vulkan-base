@@ -5,10 +5,13 @@
 
 class Instance;
 
-#define DEVICE_FUNCTIONS(o) o(vkDestroyDevice)
+#define DEVICE_FUNCTIONS(o) \
+	o(vkGetDeviceQueue) \
+	o(vkDestroyDevice)
 
 class Device {
 	VkDevice device;
+	VkQueue queue;
 
 	public:
 	Device(const Instance& instance);  // Throws `std::runtime_error()`.
