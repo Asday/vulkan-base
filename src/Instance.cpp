@@ -17,9 +17,18 @@ using namespace std::literals::string_literals;
 #ifdef NDEBUG
 	constexpr std::array<std::string_view, 0> wantedLayers{};
 #else
+	#define WANTED_LAYERS(o) o(VK_LAYER_KHRONOS_validation)
+	#define o(name) #name##sv
 	constexpr std::array wantedLayers{
-		"VK_LAYER_KHRONOS_validation"sv
+		WANTED_LAYERS(o),
 	};
+	#undef o
+	#define o(name) #name
+	constexpr std::array wantedLayersCStrs{
+		WANTED_LAYERS(o),
+	};
+	#undef o
+	#undef WANTED_LAYERS
 #endif
 
 namespace {
@@ -95,6 +104,9 @@ Instance::Instance() : loader(Loader()) {
 
 			throw std::runtime_error(error.str());
 		}
+
+		instanceCreateInfo.enabledLayerCount = wantedLayers.size();
+		instanceCreateInfo.ppEnabledLayerNames = wantedLayersCStrs.data();
 	}
 
 	{
