@@ -1,7 +1,9 @@
-#include "../Device.h"
+#include "../GLFW.h"
 #include "../Instance.h"
 
-#include <vulkan/vulkan.h>
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+#undef GLFW_INCLUDE_NONE
 
 #include <iostream>
 #include <string>
@@ -15,5 +17,11 @@ int main() {
 	if (!r.success) {
 		std::cout << "failed to create a device: "s << r.error << std::endl;
 		return -1;
+	}
+
+	const GLFW glfw{};
+	const auto window{glfw.createWindow()};
+	while (!glfwWindowShouldClose(window.window)) {
+		glfwPollEvents();
 	}
 }

@@ -1,8 +1,10 @@
 BASE_CPPFLAGS = \
 	-std=c++23 \
-	-lvulkan -ldl -lxcb \
+	-lvulkan -ldl -lxcb -lglfw \
 	-DVK_USE_PLATFORM_XCB_KHR \
 	-O3
+
+LDFLAGS = -lglfw
 
 # One config per required build configuration.  The first config listed
 # is used as the default for `make {cmd}`.
