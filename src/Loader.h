@@ -6,7 +6,9 @@
 #include <vulkan/vulkan.h>
 
 #define EXPORTED_FUNCTIONS(o) o(vkGetInstanceProcAddr)
-#define GLOBAL_FUNCTIONS(o) o(vkCreateInstance)
+#define GLOBAL_FUNCTIONS(o) \
+	o(vkCreateInstance) \
+	o(vkEnumerateInstanceLayerProperties)
 
 class Loader {
 	const DLL dll;

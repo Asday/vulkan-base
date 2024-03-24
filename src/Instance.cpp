@@ -5,11 +5,65 @@
 #include "Loader.h"
 #include "return_codes.h"
 
+#include <array>
 #include <stdexcept>
 #include <sstream>
 #include <string>
+#include <vector>
 
+using namespace std::literals;
 using namespace std::literals::string_literals;
+
+#ifdef NDEBUG
+	constexpr std::array<std::string_view, 0> wantedLayers{};
+#else
+	constexpr std::array wantedLayers{
+		"VK_LAYER_KHRONOS_validation"sv
+	};
+#endif
+
+namespace {
+	uint32_t countLayerProperties(const Loader& loader) {
+		uint32_t c;
+		loader.vkEnumerateInstanceLayerProperties(&c, nullptr);
+
+		return c;
+	}
+
+	std::vector<VkLayerProperties>
+	enumerateLayerProperties(const Loader& loader) {
+		uint32_t c{countLayerProperties(loader)};
+		auto lps{std::vector<VkLayerProperties>(c)};
+
+		loader.vkEnumerateInstanceLayerProperties(&c, lps.data());
+
+		return lps;
+	}
+
+	std::vector<std::string_view> missingWantedLayers(const Loader& loader) {
+		std::vector<std::string_view> missing{};
+		{
+			std::vector<std::string_view> layerNames;
+			{
+				std::vector<VkLayerProperties> lps{enumerateLayerProperties(loader)};
+				layerNames = std::vector<std::string_view>(lps.size());
+				for (const auto& lp : lps) { layerNames.push_back(lp.layerName); }
+			}
+
+			for (const auto& wantedLayer : wantedLayers) {
+				for (const auto& gotLayer : layerNames) {
+					// Can't `std::find()` for some reason.
+					// See: `docs/find-in-vector-of-string-views.md`
+					if (gotLayer == wantedLayer) { goto found; }
+				}
+				missing.push_back(wantedLayer);
+				found:
+			}
+		}
+
+		return missing;
+	}
+}
 
 Instance::Instance() : loader(Loader()) {
 	VkApplicationInfo applicationInfo{
@@ -32,6 +86,16 @@ Instance::Instance() : loader(Loader()) {
 		.enabledExtensionCount = 0,
 		.ppEnabledExtensionNames = nullptr,
 	};
+
+	if constexpr(!wantedLayers.empty()) {
+		if (auto missing{missingWantedLayers(loader)}; !missing.empty()) {
+			std::stringstream error;
+			error << "failed to find layer(s): "s;
+			for (const auto& layer : missing) { error << layer; }
+
+			throw std::runtime_error(error.str());
+		}
+	}
 
 	{
 		const VkResult r = loader.vkCreateInstance(
