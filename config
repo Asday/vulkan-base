@@ -2,6 +2,7 @@ BASE_CPPFLAGS = \
 	-std=c++23 \
 	-lvulkan -ldl -lxcb -lglfw \
 	-DVK_USE_PLATFORM_XCB_KHR \
+	-DGLFW_INCLUDE_NONE \
 	-O3
 
 LDFLAGS = -lglfw
