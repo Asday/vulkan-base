@@ -35,8 +35,7 @@ std::ostream& operator<<(std::ostream& os, const DLL& dll) {
 	return os;
 }
 
-Result<void*>
-DLL::getHandle(const std::string& name) const noexcept {
+Result<void*> DLL::getHandle(const std::string& name) const noexcept {
 	dlerror();  // Clear any existing errors.
 	void* ret{dlsym(dll, name.c_str())};
 
